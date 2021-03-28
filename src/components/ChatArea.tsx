@@ -1,0 +1,38 @@
+import Message from './Message';
+import Form from './Form';
+
+export default function ChatArea(props: any) {
+const form = {
+    input: {
+        placeholder: "Write a message ...",
+        ariaLabel: "Enter message to send",
+        class: "chat-area-form-input"
+    },
+    buttonText: "Send",
+    class: "chat-area-form"
+}
+
+const onInputChange = (e: Event) => {
+    props.onMessageChange(e);
+}
+
+const onFormSubmit = (e: Event) => {
+    props.onMessageSend(e);
+}
+  return props.isVisible ? (
+      <div className="chat-area">
+          <div className="chat-area-box">
+              <Message
+                type={props.messageType}
+                message={props.message} /> 
+          </div>
+          <div className="chat-area-form-wrapper">
+            <Form
+                form={form}
+                onInputChange={onInputChange}
+                onFormSubmit={onFormSubmit}>
+            </Form>
+          </div>
+      </div>
+  ) : null;
+}
