@@ -1,0 +1,149 @@
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+.App {
+  background-color: #282c34;
+  min-height: 1267px;
+  display: flex;
+  flex-direction: column;
+  color: #e4e6eb;
+
+  .App-header {
+    min-height: 15vh;
+    margin-top: 5vh;
+  }
+
+  main {
+    margin-top: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    .welcome-area {
+      max-width: 500px;
+      width: 100%;
+      min-width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+      .welcome-area-form {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        input {
+          width: 250px;
+        }
+
+        .button {
+          width: 90px;
+        }
+      }
+    }
+
+    .chat-area {
+      background-color: #242526;
+      width: 600px;
+      min-height: 300px;
+      max-height: 1267px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      @media (max-width: 960px) {
+        max-width: 90vw;
+      }
+
+      .chat-area-box {
+        display: flex;
+        flex-direction: column;
+        align-content: flex-start;
+        align-self: flex-start;
+
+        .message-in {
+          align-self: flex-end;
+          align-content: flex-end;
+          color: #e4e6eb;
+          background-color: #1877f2;
+          font-size: 16px;
+          border-radius: 50px;
+          height: 40px;
+        }
+
+        .message-out {
+          align-self: flex-start;
+          align-content: flex-start;
+          color: #e4e6eb;
+          background-color: #3e4042;
+          font-size: 16px;
+          border-radius: 50px;
+          height: 40px;
+        }
+      }
+
+      .chat-area-form-wrapper {
+        padding-bottom: 8px;
+
+        input {
+          width: 70%;
+        }
+
+        .button {
+          width: 22.5%;
+        }
+
+        @media (max-width: 960px) {
+          input {
+            width: 65%;
+          }
+  
+          .button {
+            width: 22.5%;
+          }
+        }
+      }
+    }
+  }
+
+  .error {
+    color: #ff0033;
+  }
+
+  .message {
+    color: #ecf3ff;
+  }
+
+  input {
+    height: 40px;
+    padding-left: 24px;
+    padding-right: 24px;
+    border: 0;
+    border-radius: 50px;
+    background-color: #3a3b3c;
+    margin: 0 8px;
+    font-size: 16px;
+    color: #ecf3ff;
+    outline: none;
+  }
+
+  .button {
+    height: 40px;
+    min-width: 60px;
+    border: 0;
+    border-radius: 50px;
+    margin: 0 8px;
+    background-color: #2851a3;
+    color: #ecf3ff;
+    font-size: 16px;
+    outline: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #1877f2;
+    }
+  }
+}
