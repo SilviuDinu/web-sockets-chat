@@ -25,6 +25,7 @@ export default function WecomeArea(props: any) {
       <div className="welcome-area">
         <Form
             form={form}
+            inputValue={props.name}
             onInputChange={onInputChange}
             onFormSubmit={onFormSubmit}>
         </Form>
