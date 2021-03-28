@@ -8,9 +8,11 @@ export default function Form(props: any) {
         <input
             type="text"
             name="name"
+            autoComplete="off"
             className={form.input.class}
             placeholder={form.input.placeholder}
             aria-label={form.input.ariaLabel}
+            value={props.inputValue}
             onChange={event => props.onInputChange(event)}
         />
         <button type="submit" className="button">

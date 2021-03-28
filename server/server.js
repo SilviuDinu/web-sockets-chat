@@ -17,13 +17,11 @@ http.listen(port, () => {
   console.log(`listening on *:${port}`);
 });
 
-const connected = [];
-const gameRoomTracker = [];
+const messages = [];
 
 io.on('connection', socket => {
   console.log('new client connected');
   socket.on('join room', async ({ name }) => {
-    console.log(name)
     try {
       socket.join('chat', name);
       io.to('chat').emit('connection success', `${name} successfully joined chat!`);
@@ -34,9 +32,10 @@ io.on('connection', socket => {
   });
 
   socket.on('send message', async ({ message, name }) => {
-    console.log(message)
+    console.log(message);
     try {
-      socket.broadcast.emit('message', message);
+      // messages.push({ message, name });
+      socket.broadcast.emit('message', { message, sender: name });
     } catch {
       console.error(`Something went wrong`);
       socket.emit('message error', `Failed to send message`);

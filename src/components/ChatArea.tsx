@@ -1,38 +1,39 @@
-import Message from './Message';
+import MessageList from './MessageList';
 import Form from './Form';
 
 export default function ChatArea(props: any) {
-const form = {
+
+  const form = {
     input: {
-        placeholder: "Write a message ...",
-        ariaLabel: "Enter message to send",
-        class: "chat-area-form-input"
+      placeholder: 'Write a message ...',
+      ariaLabel: 'Enter message to send',
+      class: 'chat-area-form-input',
     },
-    buttonText: "Send",
-    class: "chat-area-form"
-}
+    buttonText: 'Send',
+    class: 'chat-area-form',
+  };
 
-const onInputChange = (e: Event) => {
+  const onInputChange = (e: Event) => {
     props.onMessageChange(e);
-}
+  };
 
-const onFormSubmit = (e: Event) => {
+  const onFormSubmit = (e: Event) => {
     props.onMessageSend(e);
-}
+  };
+
   return props.isVisible ? (
-      <div className="chat-area">
-          <div className="chat-area-box">
-              <Message
-                type={props.messageType}
-                message={props.message} /> 
-          </div>
-          <div className="chat-area-form-wrapper">
-            <Form
-                form={form}
-                onInputChange={onInputChange}
-                onFormSubmit={onFormSubmit}>
-            </Form>
-          </div>
+    <div className="chat-area">
+      <div className="chat-area-box">
+        <MessageList messages={props.chat} />
       </div>
+      <div className="chat-area-form-wrapper">
+        <Form
+            form={form}
+            inputValue={props.messageOut}
+            onInputChange={onInputChange}
+            onFormSubmit={onFormSubmit}>
+        </Form>
+      </div>
+    </div>
   ) : null;
 }
