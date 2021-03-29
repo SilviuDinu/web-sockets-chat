@@ -1,4 +1,5 @@
 import MessageList from './MessageList';
+import Notification from './Notification';
 import Form from './Form';
 
 export default function ChatArea(props: any) {
@@ -25,6 +26,10 @@ export default function ChatArea(props: any) {
     <div className="chat-area">
       <div className="chat-area-box">
         <MessageList messages={props.chat} />
+        {props.typing.enabled ? <Notification
+          type="temporary"
+          elem="span"
+          message={props.typing.message} /> : null }
       </div>
       <div className="chat-area-form-wrapper">
         <Form
