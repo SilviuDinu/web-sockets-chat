@@ -94,10 +94,15 @@
               justify-content: center;
               display: flex;
               font-size: 16px;
-              border-radius: 50px;
-              height: 40px;
+              border-radius: 30px;
+              text-align: left;
+              min-height: 40px;
+              max-width: 350px;
               padding-left: 16px;
+              padding-top: 8px;
+              padding-bottom: 8px;
               padding-right: 16px;
+              word-break: break-all;
             }
           }
 
@@ -118,12 +123,17 @@
               align-items: center;
               align-content: center;
               justify-content: center;
+              text-align: left;
               display: flex;
               font-size: 16px;
-              border-radius: 50px;
-              height: 40px;
+              border-radius: 30px;
+              min-height: 40px;
+              max-width: 350px;
               padding-left: 16px;
+              padding-top: 8px;
+              padding-bottom: 8px;
               padding-right: 16px;
+              word-break: break-all;
             }
           }
         }
