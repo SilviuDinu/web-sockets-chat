@@ -18,6 +18,10 @@ function App() {
   const [name, setName] = useState<string>('');
   const [messageOut, setMessageOut] = useState<string>('');
   const [chat, setChat] = useState<any[]>([]);
+  const [typing, setTyping] = useState<{ message: string; enabled: boolean }>({
+    message: '',
+    enabled: false,
+  });
   const [notification, setNotification] = useState<Notification>({ message: '', type: 'message' });
   const [hasAnyConnectionError, setHasAnyConnectionError] = useState<boolean>(false);
 
@@ -32,6 +36,23 @@ function App() {
           type: 'message-in',
         },
       ]);
+      setTyping({
+        enabled: false,
+        message: '',
+      });
+    });
+
+    socket.on('typing', (message: string) => {
+      setTyping({
+        enabled: true,
+        message,
+      });
+      setTimeout((): void => {
+        setTyping({
+          enabled: false,
+          message: '',
+        });
+      }, 4000);
     });
   }, []);
 
@@ -48,6 +69,14 @@ function App() {
           message: success,
           type: 'message',
         });
+        setChat(chat => [
+          ...chat,
+          {
+            id: chat.length + 1,
+            message: success,
+            type: 'notification',
+          },
+        ]);
         setHasAnyConnectionError(false);
       });
       socket.on('connection error', (err: string) => {
@@ -79,9 +108,13 @@ function App() {
     };
     socket.emit('send message', out);
     setChat([
-      ...chat,
+      ...chat, 
       out
     ]);
+    setTyping({
+      enabled: false,
+      message: '',
+    });
     setMessageOut('');
   };
 
@@ -90,6 +123,7 @@ function App() {
   };
 
   const onMessageChange = (e: Event): void => {
+    socket.emit('start typing', { name });
     setMessageOut((e.target as HTMLTextAreaElement).value || '');
   };
 
@@ -103,15 +137,14 @@ function App() {
           onNameSubmit={joinRoom}
           onNameChange={onNameChange}
           hasAnyConnectionError={hasAnyConnectionError}
-          notification={notification}>
-        </WelcomeArea>
+          notification={notification}></WelcomeArea>
         <ChatArea
           isVisible={connected}
           chat={chat}
+          typing={typing}
           messageOut={messageOut}
           onMessageChange={onMessageChange}
-          onMessageSend={sendMessage}>
-        </ChatArea>
+          onMessageSend={sendMessage}></ChatArea>
       </Body>
     </div>
   );

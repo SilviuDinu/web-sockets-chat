@@ -8,7 +8,7 @@ export default function MessageList(props: any) {
               <Message
                 key={item.id || index}
                 type={item.type}
-                sender={item.name}
+                sender={item.name || null}
                 message={item.message} />
               );
         })}

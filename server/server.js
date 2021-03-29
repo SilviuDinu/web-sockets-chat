@@ -17,14 +17,13 @@ http.listen(port, () => {
   console.log(`listening on *:${port}`);
 });
 
-const messages = [];
 
 io.on('connection', socket => {
   console.log('new client connected');
   socket.on('join room', async ({ name }) => {
     try {
       socket.join('chat', name);
-      io.to('chat').emit('connection success', `${name} successfully joined chat!`);
+      io.to('chat').emit('connection success', `${name} joined the chat!`);
     } catch {
       console.error(`Couldn't join room!`);
       socket.emit('connection error', `${name} failed to join the room!`);
@@ -34,11 +33,14 @@ io.on('connection', socket => {
   socket.on('send message', async ({ message, name }) => {
     console.log(message);
     try {
-      // messages.push({ message, name });
       socket.broadcast.emit('message', { message, sender: name });
     } catch {
       console.error(`Something went wrong`);
       socket.emit('message error', `Failed to send message`);
     }
+  });
+
+  socket.on('start typing', ({name}) => {
+    socket.broadcast.emit('typing', `${name} is typing...`);
   });
 });
