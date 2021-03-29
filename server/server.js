@@ -9,7 +9,7 @@ const io = require('socket.io')(http);
 app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join('../client/public')));
+app.use(express.static(path.join('../build')));
 
 const port = process.env.PORT || 1337;
 
