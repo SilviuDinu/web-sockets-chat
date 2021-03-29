@@ -1,3 +1,13 @@
+# How to start the project on master branch
+
+1. git clone https://github.com/SilviuDinu/web-sockets-chat
+2. cd web-sockets-chat
+3. npm i
+4. cd server && npm i
+5. npm run dev (inside the /server directory)
+6. go to http://localhost:1337 and enjoy
+7. you can connect via multiple browser tabs to talk to yourself
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
