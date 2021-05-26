@@ -1,0 +1,127 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders Chat Area 1`] = `
+<div
+  className="chat-area"
+>
+  <div
+    className="chat-area-box"
+  >
+    <div
+      className="message-list"
+    >
+      <div
+        className="notification"
+      >
+        <div
+          className="sender"
+        />
+        <div
+          className="message"
+        >
+          <span>
+            William has joined the chat
+          </span>
+        </div>
+      </div>
+      <div
+        className="notification"
+      >
+        <div
+          className="sender"
+        />
+        <div
+          className="message"
+        >
+          <span>
+            John has joined the chat
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="chat-area-form-wrapper"
+  >
+    <form
+      className="chat-area-form"
+      method="POST"
+      onSubmit={[Function]}
+    >
+      <input
+        aria-label="Enter message to send"
+        autoComplete="off"
+        className="chat-area-form-input"
+        name="name"
+        onChange={[Function]}
+        placeholder="Write a message ..."
+        type="text"
+        value="Salut"
+      />
+      <button
+        className="button"
+        type="submit"
+      >
+        Send
+      </button>
+    </form>
+  </div>
+</div>
+`;
+
+exports[`renders Welcome Area 1`] = `
+Array [
+  <div
+    className="welcome-area"
+  >
+    <form
+      className="welcome-area-form"
+      method="POST"
+      onSubmit={[Function]}
+    >
+      <input
+        aria-label="Enter a name to be used in the chat room"
+        autoComplete="off"
+        className="welcome-area-form-input"
+        name="name"
+        onChange={[Function]}
+        placeholder="Please enter your name..."
+        type="text"
+        value="William"
+      />
+      <button
+        className="button"
+        type="submit"
+      >
+        Send
+      </button>
+    </form>
+  </div>,
+  <div
+    className="error"
+  >
+    <p />
+  </div>,
+]
+`;
+
+exports[`test MessageList 1`] = `
+<div
+  className="message-list"
+>
+  <div
+    className="message-in"
+  >
+    <div
+      className="sender"
+    />
+    <div
+      className="message"
+    >
+      <span>
+        Salut
+      </span>
+    </div>
+  </div>
+</div>
+`;

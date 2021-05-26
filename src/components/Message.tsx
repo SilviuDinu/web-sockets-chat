@@ -5,7 +5,10 @@ export default function Message(props: any) {
 
   const updateScrollPos = (): void => {
     chatBoxRef.current.scrollIntoView(true);
-    document.querySelector<any>('.chat-area .chat-area-box').scrollTop += 10;
+    const element = document.querySelector<any>('.chat-area .chat-area-box');
+    if(element) {
+      element.scrollTop += 10;
+    }
   };
 
   useEffect(() => {
