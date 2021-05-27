@@ -10,7 +10,8 @@ import ChatArea from './components/ChatArea';
 import { MESSAGES } from './data/enums/messages.enum';
 import { Notification } from './data/models/notification.model';
 
-const socket = io('/', { transports: ['polling'] });
+const url= process.env.NODE_ENV==='test'?'':`/`;
+const socket = io(url, { transports: ['polling'] });
 
 function App() {
   const [title, setTitle] = useState<MESSAGES | string>(MESSAGES.TITLE);
@@ -36,10 +37,7 @@ function App() {
           type: 'message-in',
         },
       ]);
-      setTyping({
-        enabled: false,
-        message: '',
-      });
+      resetTyping();
     });
 
     socket.on('typing', (message: string) => {
@@ -48,10 +46,7 @@ function App() {
         message,
       });
       setTimeout((): void => {
-        setTyping({
-          enabled: false,
-          message: '',
-        });
+        resetTyping();
       }, 4000);
     });
   }, []);
@@ -90,6 +85,13 @@ function App() {
     }
   };
 
+  const resetTyping = (): void => {
+    setTyping({
+      enabled: false,
+      message: '',
+    });
+  };
+
   const sendMessage = (e: Event) => {
     if (e) {
       e.preventDefault();
@@ -107,14 +109,7 @@ function App() {
       type: 'message-out',
     };
     socket.emit('send message', out);
-    setChat([
-      ...chat, 
-      out
-    ]);
-    setTyping({
-      enabled: false,
-      message: '',
-    });
+    setChat([...chat, out]);
     setMessageOut('');
   };
 

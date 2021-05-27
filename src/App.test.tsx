@@ -1,26 +1,19 @@
 import React, { useState } from 'react';
-import { render, screen } from '@testing-library/react';
-import { io } from 'socket.io-client';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 import { MESSAGES } from './data/enums/messages.enum';
 import WelcomeArea from './components/WelcomeArea';
 import MessageList from './components/MessageList';
 import Message from './components/Message';
+import Body from './components/Body';
 import ChatArea from './components/ChatArea';
 import Header from './components/Header';
 import renderer from 'react-test-renderer';
-import { mount, shallow } from 'enzyme';
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const Client = require('socket.io-client');
 
-const MessageMock = (props: any) => {
-  return (
-    <div className={props.type}>
-      <div className="sender">{props.sender}</div>
-      <div className="message">
-        <span>{props.message}</span>
-      </div>
-    </div>
-  );
-};
+// jest.mock('socket.io-client');
 
 test(`renders Silviu's Chat Application`, () => {
   render(<App />);
@@ -108,10 +101,59 @@ test(`test Message`, () => {
   expect(msg).toBeInTheDocument();
 });
 
-jest.mock('socket.io-client', () => {
-  const emit = jest.fn();
-  const on = jest.fn();
-  const socket = { emit, on };
-  return jest.fn(() => socket);
+describe('socket backend', () => {
+  let io: any, serverSocket: any, clientSocket: any;
+
+  beforeAll(done => {
+    const httpServer = createServer();
+    io = new Server(httpServer);
+    httpServer.listen(() => {
+      const port = httpServer.address().port;
+      clientSocket = new Client(`http://localhost:${port}`);
+      io.on('connection', (socket: any) => {
+        serverSocket = socket;
+      });
+      clientSocket.on('connect', done);
+    });
+  });
+
+  afterAll(() => {
+    io.close();
+    clientSocket.close();
+  });
+
+  test('should work to send and receive messages', done => {
+    clientSocket.on('message', (req: any) => {
+      expect(req.message).toBe('Salut');
+      done();
+    });
+    serverSocket.emit('message', { message: 'Salut' });
+  });
 });
 
+// describe('my socket backend', () => {
+//   let io: any, clientSocket: any;
+
+//   beforeAll(done => {
+//     const httpServer = createServer();
+//     io = new Server(httpServer);
+//     httpServer.listen(() => {
+//       clientSocket = new Client(`http://localhost:1337/`);
+//     });
+//   });
+
+//   afterAll(() => {
+//     io.close();
+//     clientSocket.close();
+//   });
+
+//   test('should test backend events', done => {
+//     clientSocket.emit('join room', { name: 'Benedict' });
+//     jest.setTimeout(6000);
+//     done();
+//     clientSocket.on('connection success', async (arg: any) => {
+//       expect(arg).toBe(`Benedict joined the chat!`);
+//       done();
+//     });
+//   });
+// });
