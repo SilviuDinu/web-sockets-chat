@@ -103,7 +103,7 @@ test(`test Message`, () => {
   expect(msg).toBeInTheDocument();
 });
 
-describe('it should test the state', () => {
+describe('it should test the functions', () => {
   let component: any;
   let instance: any;
   beforeEach(() => {
@@ -125,18 +125,53 @@ describe('it should test the state', () => {
     jest.spyOn(instance, 'setState');
     jest.spyOn(instance['socket'], 'emit').mockImplementation(() => {});
     jest.spyOn(instance['socket'], 'on');
-    instance.joinRoom({ preventDefault: () => {}, target: { value: 'Send' } });;
+    instance.joinRoom({ preventDefault: () => {}, target: { value: 'Send' } });
     expect(instance['socket'].emit).toHaveBeenCalled();
     expect(instance['socket'].on).toHaveBeenCalled();
   });
   it('should test sendMessage function', () => {
-    jest.spyOn(instance, 'handleMessageOut').mockImplementation(() => { });
+    jest.spyOn(instance, 'handleMessageOut').mockImplementation(() => {});
     const event = { preventDefault: () => {}, target: { value: 'Send' } };
     const eventSpy = jest.spyOn(event, 'preventDefault');
     instance.state['connected'] = true;
     instance.sendMessage(event);
     expect(eventSpy).toHaveBeenCalled();
     expect(instance.handleMessageOut).toHaveBeenCalled();
+  });
+  it('should test onNameChange function', () => {
+    jest.spyOn(instance, 'setState');
+    const event = { preventDefault: () => {}, target: { value: 'Send' } };
+    instance.onNameChange(event);
+    expect(instance.setState).toHaveBeenCalledWith({ name: 'Send' });
+  });
+  it('should test onNameChange function and assign empty string', () => {
+    jest.spyOn(instance, 'setState');
+    const event = { preventDefault: () => {}, target: { value: null } };
+    instance.onNameChange(event);
+    expect(instance.setState).toHaveBeenCalledWith({ name: '' });
+  });
+  it('should test onMessageChange function', () => {
+    jest.spyOn(instance, 'setState');
+    jest.spyOn(instance['socket'], 'emit').mockImplementation(() => {});
+    const event = { preventDefault: () => {}, target: { value: 'Salut' } };
+    instance.onMessageChange(event);
+    expect(instance.setState).toHaveBeenCalledWith({ messageOut: 'Salut' });
+    expect(instance['socket'].emit).toHaveBeenCalled();
+  });
+  it('should test onMessageChange function and assign empty string', () => {
+    jest.spyOn(instance, 'setState');
+    jest.spyOn(instance['socket'], 'emit').mockImplementation(() => {});
+    const event = { preventDefault: () => {}, target: { value: null } };
+    instance.onMessageChange(event);
+    expect(instance.setState).toHaveBeenCalledWith({ messageOut: '' });
+    expect(instance['socket'].emit).toHaveBeenCalled();
+  });
+  it('should test handleMessageOut function', () => {
+    jest.spyOn(instance, 'setState');
+    jest.spyOn(instance['socket'], 'emit').mockImplementation(() => {});
+    instance.handleMessageOut();
+    expect(instance['socket'].emit).toHaveBeenCalled();
+    expect(instance.setState).toHaveBeenCalled();
   });
 });
 
