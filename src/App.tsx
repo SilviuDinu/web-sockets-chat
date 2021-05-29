@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { io } from 'socket.io-client';
 
 import './App.scss';
@@ -10,139 +10,183 @@ import ChatArea from './components/ChatArea';
 import { MESSAGES } from './data/enums/messages.enum';
 import { Notification } from './data/models/notification.model';
 
-const url= process.env.NODE_ENV==='test'?'':`/`;
-const socket = io(url, { transports: ['polling'] });
+// const url = process.env.NODE_ENV === 'test' ? '' : `/`;
+// const socket = io(url, { transports: ['polling'] });
+export default class App extends React.Component {
 
-function App() {
-  const [title, setTitle] = useState<MESSAGES | string>(MESSAGES.TITLE);
-  const [connected, setConnected] = useState<boolean>(false);
-  const [name, setName] = useState<string>('');
-  const [messageOut, setMessageOut] = useState<string>('');
-  const [chat, setChat] = useState<any[]>([]);
-  const [typing, setTyping] = useState<{ message: string; enabled: boolean }>({
+  socket: any;
+  url = process.env.NODE_ENV === 'test' ? '' : `/`;
+
+  title: MESSAGES | string = MESSAGES.TITLE;
+  connected: boolean = false;
+  name: string = '';
+  messageOut: string = '';
+  chat: any[] = [];
+  typing: { message: string; enabled: boolean } = {
     message: '',
     enabled: false,
-  });
-  const [notification, setNotification] = useState<Notification>({ message: '', type: 'message' });
-  const [hasAnyConnectionError, setHasAnyConnectionError] = useState<boolean>(false);
+  };
+  notification: Notification = { message: '', type: 'message' };
+  hasAnyConnectionError: boolean = false;
 
-  useEffect(() => {
-    socket.on('message', ({ message, sender }: any) => {
-      setChat(chat => [
-        ...chat,
+  state = {
+    title: this.title,
+    connected: this.connected,
+    name: this.name,
+    messageOut: this.messageOut,
+    chat: this.chat,
+    typing: this.typing,
+    notification: this.connected,
+    hasAnyConnectionError: this.hasAnyConnectionError,
+  };
+
+  constructor(props: any) {
+    super(props);
+    this.socket = io(this.url, { transports: ['polling'] });
+  }
+
+  componentDidMount() {
+    this.socket.on('message', ({ message, sender }: any) => {
+      this.setState(
         {
-          id: chat.length + 1,
-          name: sender,
-          message,
-          type: 'message-in',
+          chat: [
+            ...this.state.chat,
+            {
+              id: this.state.chat.length + 1,
+              name: sender,
+              message,
+              type: 'message-in',
+            },
+          ],
         },
-      ]);
-      resetTyping();
+        () => this.resetTyping()
+      );
     });
 
-    socket.on('typing', (message: string) => {
-      setTyping({
-        enabled: true,
-        message,
+    this.socket.on('typing', (message: string) => {
+      this.setState({
+        typing: {
+          enabled: true,
+          message,
+        },
       });
       setTimeout((): void => {
-        resetTyping();
+        this.resetTyping();
       }, 4000);
     });
-  }, []);
+  }
 
-  const joinRoom = (e: Event) => {
-    if (e) {
-      e.preventDefault();
-    }
-    if (!connected) {
-      socket.emit('join room', { name });
-      socket.on('connection success', (success: string) => {
-        setConnected(true);
-        setTitle(MESSAGES.WELCOME + name);
-        setNotification({
-          message: success,
-          type: 'message',
-        });
-        setChat(chat => [
-          ...chat,
-          {
-            id: chat.length + 1,
-            message: success,
-            type: 'notification',
-          },
-        ]);
-        setHasAnyConnectionError(false);
-      });
-      socket.on('connection error', (err: string) => {
-        setConnected(false);
-        setNotification({
-          message: err,
-          type: 'error',
-        });
-        setHasAnyConnectionError(true);
-      });
-    }
-  };
-
-  const resetTyping = (): void => {
-    setTyping({
-      enabled: false,
-      message: '',
+  resetTyping = (): void => {
+    this.setState({
+      typing: {
+        enabled: false,
+        message: '',
+      },
     });
   };
 
-  const sendMessage = (e: Event) => {
+  joinRoom = (e: Event) => {
     if (e) {
       e.preventDefault();
     }
-    if (connected) {
-      handleMessageOut();
+    const { connected, name } = this.state;
+    if (!connected) {
+      this.socket.emit('join room', { name });
+      this.socket.on('connection success', (success: string) => {
+        this.setState({
+          connected: true,
+          title: MESSAGES.WELCOME + name,
+          notification: {
+            message: success,
+            type: 'message',
+          },
+          chat: [
+            ...this.state.chat,
+            {
+              id: this.state.chat.length + 1,
+              message: success,
+              type: 'notification',
+            },
+          ],
+          hasAnyConnectionError: false,
+        });
+      });
+      this.socket.on('connection error', (err: string) => {
+        this.setState({
+          connected: false,
+          notification: {
+            message: err,
+            type: 'error',
+          },
+          hasAnyConnectionError: true,
+        });
+      });
     }
   };
 
-  const handleMessageOut = (): void => {
+  sendMessage = (e: Event) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    const { connected } = this.state;
+
+    if (connected) {
+      this.handleMessageOut();
+    }
+  };
+
+  handleMessageOut = (): void => {
     const out = {
-      id: chat.length + 1,
-      name,
-      message: messageOut,
+      id: this.state.chat.length + 1,
+      name: this.state.name,
+      message: this.state.messageOut,
       type: 'message-out',
     };
-    socket.emit('send message', out);
-    setChat([...chat, out]);
-    setMessageOut('');
+    this.socket.emit('send message', out);
+    this.setState({
+      chat: [...this.state.chat, out],
+      messageOut: '',
+    });
   };
 
-  const onNameChange = (e: Event): void => {
-    setName((e.target as HTMLTextAreaElement).value || '');
+  onNameChange = (e: Event): void => {
+    const name = (e.target as HTMLTextAreaElement).value || '';
+    this.setState({
+      name,
+    });
   };
 
-  const onMessageChange = (e: Event): void => {
-    socket.emit('start typing', { name });
-    setMessageOut((e.target as HTMLTextAreaElement).value || '');
+  onMessageChange = (e: Event): void => {
+    this.socket.emit('start typing', { name: this.state.name });
+    const msg = (e.target as HTMLTextAreaElement).value || '';
+    this.setState({
+      messageOut: msg,
+    });
   };
 
-  return (
-    <div className="App">
-      <Header title={title}></Header>
-      <Body>
-        <WelcomeArea
-          isVisible={!connected}
-          name={name}
-          onNameSubmit={joinRoom}
-          onNameChange={onNameChange}
-          hasAnyConnectionError={hasAnyConnectionError}
-          notification={notification}></WelcomeArea>
-        <ChatArea
-          isVisible={connected}
-          chat={chat}
-          typing={typing}
-          messageOut={messageOut}
-          onMessageChange={onMessageChange}
-          onMessageSend={sendMessage}></ChatArea>
-      </Body>
-    </div>
-  );
+  render() {
+    const { title, connected, hasAnyConnectionError, chat, typing, messageOut, notification, name } = this.state;
+    return (
+      <div className="App">
+        <Header title={title}></Header>
+        <Body>
+          <WelcomeArea
+            isVisible={!connected}
+            name={name}
+            onNameSubmit={this.joinRoom}
+            onNameChange={this.onNameChange}
+            hasAnyConnectionError={hasAnyConnectionError}
+            notification={notification}></WelcomeArea>
+          <ChatArea
+            isVisible={connected}
+            chat={chat}
+            typing={typing}
+            messageOut={messageOut}
+            onMessageChange={this.onMessageChange}
+            onMessageSend={this.sendMessage}></ChatArea>
+        </Body>
+      </div>
+    );
+  }
 }
-
-export default App;

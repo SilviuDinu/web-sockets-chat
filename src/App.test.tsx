@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Component, ReactComponentElement, useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 import { MESSAGES } from './data/enums/messages.enum';
@@ -9,11 +9,13 @@ import Body from './components/Body';
 import ChatArea from './components/ChatArea';
 import Header from './components/Header';
 import renderer from 'react-test-renderer';
+import { configure, EnzymeAdapter, mount, shallow } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const Client = require('socket.io-client');
 
-// jest.mock('socket.io-client');
+configure({ adapter: new Adapter() });
 
 test(`renders Silviu's Chat Application`, () => {
   render(<App />);
@@ -101,6 +103,43 @@ test(`test Message`, () => {
   expect(msg).toBeInTheDocument();
 });
 
+describe('it should test the state', () => {
+  let component: any;
+  let instance: any;
+  beforeEach(() => {
+    component = shallow(<App />);
+    instance = component.instance();
+  });
+  it('should have a defined state', () => {
+    expect(component.state).toBeDefined();
+  });
+  it('state should have a defined title', () => {
+    expect(component.state('title')).toBe(MESSAGES.TITLE);
+  });
+  it('should reset typing', () => {
+    jest.spyOn(instance, 'setState');
+    instance.resetTyping();
+    expect(instance.setState).toHaveBeenCalled();
+  });
+  it('should join room', () => {
+    jest.spyOn(instance, 'setState');
+    jest.spyOn(instance['socket'], 'emit').mockImplementation(() => {});
+    jest.spyOn(instance['socket'], 'on');
+    instance.joinRoom({ preventDefault: () => {}, target: { value: 'Send' } });;
+    expect(instance['socket'].emit).toHaveBeenCalled();
+    expect(instance['socket'].on).toHaveBeenCalled();
+  });
+  it('should test sendMessage function', () => {
+    jest.spyOn(instance, 'handleMessageOut').mockImplementation(() => { });
+    const event = { preventDefault: () => {}, target: { value: 'Send' } };
+    const eventSpy = jest.spyOn(event, 'preventDefault');
+    instance.state['connected'] = true;
+    instance.sendMessage(event);
+    expect(eventSpy).toHaveBeenCalled();
+    expect(instance.handleMessageOut).toHaveBeenCalled();
+  });
+});
+
 describe('socket backend', () => {
   let io: any, serverSocket: any, clientSocket: any;
 
@@ -130,30 +169,3 @@ describe('socket backend', () => {
     serverSocket.emit('message', { message: 'Salut' });
   });
 });
-
-// describe('my socket backend', () => {
-//   let io: any, clientSocket: any;
-
-//   beforeAll(done => {
-//     const httpServer = createServer();
-//     io = new Server(httpServer);
-//     httpServer.listen(() => {
-//       clientSocket = new Client(`http://localhost:1337/`);
-//     });
-//   });
-
-//   afterAll(() => {
-//     io.close();
-//     clientSocket.close();
-//   });
-
-//   test('should test backend events', done => {
-//     clientSocket.emit('join room', { name: 'Benedict' });
-//     jest.setTimeout(6000);
-//     done();
-//     clientSocket.on('connection success', async (arg: any) => {
-//       expect(arg).toBe(`Benedict joined the chat!`);
-//       done();
-//     });
-//   });
-// });
